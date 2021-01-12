@@ -17,47 +17,72 @@
    
 </head>
 <body>
+    <?php 
+    // print_r($_SESSION['cart']);
+      
+    ?>
 
     <div class="main-container">
         <nav>
+           
             <div class="link">
                              
-                <button class="btn">  
-                    <span>
-                        <a href=""> <i class="fa fa-shopping-cart" aria-hidden="true"></i> My Cart</a>
+                <button class="btn" id="btn-show-cart-number">  
+                    <span >
+                        <a href="" id="link-show-cart-number"> <i class="fa fa-shopping-cart" aria-hidden="true"></i> My Cart
+                        
+                        <?php
+                            if (isset($_SESSION['cart'])) {
+                                $cartCount = count($_SESSION['cart']);
+                                echo "<span id='show-cart-number'> $cartCount </span></a>";
+                            }else{
+                                echo '<span id="show-cart-number"></span></a> ';
+                            }
+                        ?>
+                        
                     </span>
                 </button>
-                <button class="btn">
+                <?php
+                    if (isset($_SESSION['juId'])) {
+                        echo '
+                        <button class="btn">
                 
+                        <span>
+                            <a href=""><i class="fa fa-truck" aria-hidden="true"></i>  Orders</a>
+                        </span>
+                    </button>
+                    <button class="btn">
                     <span>
-                        <a href=""><i class="fa fa-truck" aria-hidden="true"></i>  Orders</a>
-                    </span>
-                </button>
-                <button class="btn">
-                <span>
-                 <a href=""><i class="fa fa-money" aria-hidden="true"></i> Sell on <span>JUMGA</span></a>
-                    </span>
-                </button>
-                <button class="btn">
-                <span>
+                     <a href=""><i class="fa fa-money" aria-hidden="true"></i> Sell on JUMGA</a>
+                        </span>
+                    </button>
+                    <button class="btn">
+                    <span>
+                    
+                            <a href=""><i class="fa fa-shopping-cart" aria-hidden="true"></i> Physical Store</a>
+                        </span>
+                    </button>';
+                    }
+
+                ?>
                 
-                        <a href=""><i class="fa fa-shopping-cart" aria-hidden="true"></i> Physical Store</a>
-                    </span>
-                </button>
             </div>
             <div class="action">
-                <a href="./login.php" class="btn"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</a>
-                <a href="./signup.php" class="btn"><i class="fa fa-user" aria-hidden="true"></i> Create Account</a>
+            <?php
+                if (isset($_SESSION['juId'])) {
+                   echo ' <a href="./dashboard/" class="btn"><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard</a>';
+                }else{
+                    echo '
+                    <a href="./login.php" class="btn"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</a>
+                    <a href="./signup.php" class="btn"><i class="fa fa-user" aria-hidden="true"></i> Create Account</a>
+                    ';
+                }
+            
+            ?>
+               
             </div>
         </nav>
-        <!-- <div class="search m-2">
-            <h3> <i class="fa fa-shopping-cart" aria-hidden="true"></i> <span>JUMGA</span></h2>
-           <form class="search-form" id="search-form">
-              <div class="form-group">
-                <input type="search" name="" id="search" placeholder="Search Products" class="form-control">
-              </div>
-           </form>
-        </div> -->
+      
         <div class="content">
            <div class="sidebar">
 
@@ -70,7 +95,7 @@
                 }else if(mysqli_num_rows($cQuery) < 1){
                     echo "<option value=''>NO CATEGORY</option>";
                 }else{
-        
+                    
                     while ($row = mysqli_fetch_assoc($cQuery)) {
                         $title = ucwords($row['title']);
                         $id = $row['id'];
@@ -97,10 +122,14 @@
                         $title = $row['title'];
                         
                         // FETCH PRODUCTS 
+                        
                         $product_query = mysqli_query($conn, "SELECT * FROM product WHERE category_id=$id");
+                        $numRow = mysqli_num_rows($product_query);
+                       
                         if (!$product_query) {
                             die(error("ERROR LOADING PRODUCTS"));
-                        }else if(mysqli_num_rows($product_query) > 0){
+
+                        }else if($numRow > 0){
                             echo '<div class="cart-category" id="category-id">';
                             // echo "<h3>$title</h3>";
                             while ($row = mysqli_fetch_assoc($product_query)) {
