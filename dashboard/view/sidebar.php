@@ -5,7 +5,7 @@
     <div class="sidebar-brand-icon rotate-n-15">
         <i class="fas fa-laugh-wink"></i>
     </div>
-    <div class="sidebar-brand-text mx-3">Jumga </div>
+    <div class="">Jumga </div>
 </a>
 
 <!-- Divider -->
@@ -43,6 +43,15 @@
     <a class="nav-link collapsed" href="?p=product"  >
     <i class="fa fa-shopping-cart" aria-hidden="true"></i>
         <span>Products</span>
+    </a>
+</li>
+
+<hr class="sidebar-divider">
+<!-- Nav Item - Pages Collapse Menu -->
+<li class="nav-item">
+    <a class="nav-link collapsed" href="?p=rider"  >
+    <i class="fa fa-truck" aria-hidden="true"></i>
+        <span>Riders</span>
     </a>
 </li>
 <hr class="sidebar-divider">

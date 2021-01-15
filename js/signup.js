@@ -57,12 +57,10 @@ sf.addEventListener('submit', function (event) {
                bs.disabled = true;
             }, 
             success: function (data) {
-
-                
                 se.innerHTML = data;
                 se.style.visibility = 'visible'
                 bs.innerHTML = 'Signup' 
-                bs.disabled = true;
+                bs.disabled = false;
             }
         })
     }else{

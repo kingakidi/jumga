@@ -37,12 +37,18 @@ a, a:hover, a:active, a:focus, on{
     justify-content: center;
     align-items: center;
 }
-
-#addProduct, #category-form{
+#form-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+}
+#addProduct, #category-form, #profile-form, #profile-table, #riderForm{
     width: 400px;
 }
 @media (max-width: 400px){
-    #addProduct, #category-form{
+    #addProduct, #category-form, #profile-form, #profile-table, #riderForm{
         width: 90%;
     }
 }
@@ -125,4 +131,13 @@ img{
     right: -8px;
     background-color: #fff;
     border: 2px solid #e6b043;
+}
+
+#large{
+    font-size: 3rem;
+}
+
+.error{
+    visibility: hidden;
+    text-transform: uppercase;
 }

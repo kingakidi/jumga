@@ -83,10 +83,20 @@ ob_start();
 
                 </div>
                 
-                <div class="form-group text-right">
-                    <button type="submit" class="btn btn-info" id="btn-submit">
-                       Signup
-                    </button>
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <a href="./login.php">Already has an Account?</a>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group text-right">
+                
+                            <button type="submit" class="btn btn-info" id="btn-submit">
+                            Signup
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </form>
             <div class="error singup-error" id="signup-error"></div>

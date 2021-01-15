@@ -233,7 +233,330 @@
             }
         }
 
-?>          
 
+        // GET ALL BANKS BASE ON COUNTRY 
+
+        if (isset($_POST['fetchBanks'])) {
+           $cn = $_POST['fetchBanks'];
+
+           $curl = curl_init();
+            curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.flutterwave.com/v3/banks/$cn",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "Authorization: Bearer FLWSECK-e5f055aa50071dc0c376a4703d7f7b97-X"
+            ),
+            ));
+            $response = curl_exec($curl);
+
+            curl_close($curl);
+            $res = json_decode($response, true);
+            echo "<option value=''> Choose Bank </option>";
+            foreach ($res['data'] as $banksArray) {
+            $bankName = $banksArray['name'];
+            $bankCode = $banksArray['code'];
+                echo "<option value='$bankCode'> $bankName </option>";
+            }
+        }
+
+    // USER PROFILE UPDATE 
+    if (isset($_POST['userProfileUpdate'])) {
+        $dob = $_POST['dob'];
+        $address = checkForm($_POST['address']);
+        $city = checkForm($_POST['city']);
+        $state = checkForm($_POST['state']);
+        $userid = $_SESSION['juId'];
+        // CHECK FOR EMPTY FIELDS 
+        if (!empty($dob) && !empty($address) && !empty($city) && !empty($state)) {
+            // CHECK IF TRADING NAME ALREADY EXIST 
+            $uPQuery = mysqli_query($conn, "SELECT * FROM profile WHERE userid=$userid");
+            if (!$uPQuery) {
+                die(error("USER VERIFICATION FAILED ".mysqli_error($conn)));
+            }else if(mysqli_num_rows($uPQuery) > 0){
+                echo error("PROFILE ALREADY EXIST");
+                exit();
+            }else{
+            
+            // IF NO SEND THE DATA TO DB 
+            $sql = "INSERT INTO `profile`(`userid`, `dob`, `address`, `city`, `state`) VALUES ($userid, '$dob', '$address', '$city', '$state' )";
+            $preUpdateQuery = mysqli_query($conn, $sql);
+            if (!$preUpdateQuery) {
+                die(error("FAILED TO UPDATE PROFILE <br>").mysqli_error($conn));
+            }else{
+                echo success("PROFILE UPDATED SUCCESSFULLY");
+            }
+
+
+            }
         
-  
+        }else{
+            echo error('ALL FIELD REQUIRED');
+        }
+
+    }
+    
+
+    // SETTLEMENT UPDATE FORM
+    if (isset($_POST['settlementSubmitForm'])) {
+        $tn = checkForm($_POST['tn']);
+        $act = checkForm($_POST['act']);
+        $c = strtoupper(checkForm($_POST['c']));
+        $bank = checkForm($_POST['bank']);
+        $userid = $_SESSION['juId'];
+        // CHECK FOR EMPTY FIELDS 
+        if (!empty($tn) && !empty($act) && !empty($c) && !empty($bank)) {
+            
+            // CHECK IF TRADING NAME ALREADY EXIST 
+            $tnExistQuery = mysqli_query($conn, "SELECT * FROM profile WHERE userid=$userid");
+            if (!$tnExistQuery) {
+                die(error("VALIDATING TRADING REGISTRATION FAILED ".mysqli_error($conn)));
+            }else if(mysqli_fetch_assoc($tnExistQuery)['trading_name'] !== ""){
+                echo error("YOU HAVE ALREADY REGISTERED TRADING INFORMATION");
+            }else{
+
+                $uPQuery = mysqli_query($conn, "SELECT * FROM profile WHERE userid=$userid");
+                if (!$uPQuery) {
+                    die(error("USER VERIFICATION FAILED ".mysqli_error($conn)));
+                }else if(mysqli_num_rows($uPQuery)  < 1){
+                    echo error("KINDLY FILLED IN YOUR PERSONAL DETAILS TO PROCEED");
+                    exit();
+                }else{
+                    // CHECK IF MERCHANT ALREADY EXIST 
+                    $cTradingName = mysqli_query($conn, "SELECT * FROM `profile` WHERE trading_name = '$tn'");
+                    if (!$cTradingName) {
+                        die(error("FAILED TO VERIFY TRADING NAME ").mysqli_error($conn));
+                    }else if(mysqli_num_rows($cTradingName) > 0){
+                        echo error('TRAIDING NAME ALREADY REGISTERED');
+                    }else{
+                        // SEND THE SUB ACCOUNT REQUEST TO FLUTTERWAVE 
+                        
+                        $phone = $_SESSION['juPhone'];
+                        $email =  $_SESSION['juEmail'];
+                        
+
+                        // SELECT ADDRESS FROM PROFILE PAGE 
+                        $addressQuery = mysqli_query($conn, "SELECT * FROM profile WHERE userid=$userid");
+                        if (!$addressQuery) {
+                            die(error("ADDRESS FETCH FAILED ").mysqli_error($conn));
+                        }
+                        $address = mysqli_fetch_assoc($addressQuery)['address'];
+                        // echo "$phone </br> $email <br> $address <br> $bank <br> $tn <br> $act <br> $c";
+
+
+                        // API CALL FOR SUB ACCOUNT 
+                        $curl = curl_init();
+
+                        curl_setopt_array($curl, array(
+                        CURLOPT_URL => "https://api.flutterwave.com/v3/subaccounts",
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_ENCODING => "",
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => "POST",
+                        CURLOPT_POSTFIELDS =>"{\n    \"account_bank\": \"$bank\",\n    \"account_number\": \"$act\",\n    \"business_name\": \"$tn\",\n    \"business_email\": \"$email\",\n    \"business_contact\": \"$address\",\n    \"business_contact_mobile\": \"$phone\",\n    \"business_mobile\": \"$phone\",\n    \"country\": \"$c\",\n    \"meta\": [\n        {\n            \"meta_name\": \"mem_adr\",\n            \"meta_value\": \"0x16241F327213\"\n        }\n    ],\n    \"split_type\": \"percentage\",\n    \"split_value\": 0.9\n}",
+                        CURLOPT_HTTPHEADER => array(
+                            "Content-Type: application/json",
+                            "Authorization: Bearer FLWSECK-e5f055aa50071dc0c376a4703d7f7b97-X"
+                        ),
+                        ));
+
+                        $response = curl_exec($curl);
+
+                        curl_close($curl);
+                        $res = json_decode($response, true);
+                        $status = $res['status'];
+                        $message = $res['message'];
+                        $data = $res['data'];
+                        if ($status === 'success') {
+
+                        $account_number = $data['account_number'];
+                        $bank_code = $data['account_bank'];
+                        $full_name = $data['full_name'];
+                        $subaccount_id = $data['subaccount_id'];
+                        $bank_name  = $data['bank_name'];
+                        
+                        
+
+                        // UPDATE THE PROFILE 
+                            $mUQuery = mysqli_query($conn, "UPDATE `profile` SET `trading_name`='$tn',`account_number`= $account_number,`account_name`='$full_name',`country`='$c',`bank`='$bank_name',`bank_code`='$bank_code', subaccount_id='$subaccount_id' WHERE userid=$userid");
+
+                            if (!$mUQuery) {
+                                die(error("FAILED TO UPDATE MERCHNAT ID.. CONTACT ADMIN..").mysqli_error($conn));
+                            }else{
+                                echo success("MERCHANT PROFILE UPDATED SUCCESSFULLY");
+                            }
+                        
+                        }else{
+                            $message = str_replace('A subaccount with the', 'account', $message);
+                            echo error($message);
+                        }
+
+                    }
+                }
+            }
+            }else{
+                echo error('ALL FIELD REQUIRED');
+            }      
+    }
+    
+    if (isset($_POST['scDetails'])) {
+        $userid = $_SESSION['juId'];
+        $cName = checkForm($_POST['cName']);
+        $cAddress = checkForm($_POST['cAddress']);
+        $cPhone = checkForm($_POST['cPhone']);
+        $nFleet = checkForm($_POST['nFleet']);
+        $cFileName = $_FILES['cFile']['name'];
+        $cFileSize = $_FILES['cFile']['size'];
+        $cFileType = $_FILES['cFile']['type'];
+        $cFileTmp = $_FILES['cFile']['tmp_name'];
+        
+        // CHECK FOR ANY EMPTY FIELD 
+
+        // CHECK FOR COMPANY ALREADY EXIST 
+        $cEQuery = mysqli_query($conn, "SELECT * FROM rider WHERE company_name='$cName'");
+        if ($cName === ""  OR $cAddress === "" OR $cPhone === "" OR $nFleet === "" OR empty($_FILES)) {
+            echo error("ALL FIELD REQUIRED");
+        }else if(mysqli_num_rows($cEQuery) > 0){
+            echo error("COMPANY DETAILS ALREADY EXIST");
+        }else if($cFileType !== 'application/pdf'){
+            echo error("INVALID FILE: UPLOAD PDF ONLY");
+        }else if($cFileSize > 5000000){
+            echo error("FILE TOO LARGE: MAXIMUM OF 5MB");
+        }else{
+            // CHECK IF THE USER HAS A RECORD IN DB
+            $cRQuery = mysqli_query($conn, "SELECT * FROM `rider` WHERE userid=$userid");
+            if (!$cRQuery) {
+                die("FAILED UNABLE TO VERIFY DETAILS ".mysqli_error($conn));
+            }else if(mysqli_num_rows($cRQuery) > 0){
+                echo error("COMPANY DETAILS ALREADY EXIST");
+            }else{
+                // INSERT THE VALUES INTO DB 
+                    // SET THE FILE NAME 
+                    $ext = pathinfo($cFileName, PATHINFO_EXTENSION);
+                    $p = $_SESSION['juPhone'];
+                    $nCFName = $userid."_".$cName."_".date("Y-m-d").".".$ext;
+                  
+                $sql = "INSERT INTO `rider`(`userid`, `company_name`, `company_phone`, `company_address`, `number_of_fleet`, `company_document`, `status`) VALUES ($userid, '$cName', '$cPhone', '$cAddress', '$nFleet', '$nCFName', 'false')";
+                $cDQuery =  mysqli_query($conn, $sql);
+                $cd = dirname(__DIR__, 2);
+         
+                if (move_uploaded_file($cFileTmp, $cd."/users/sydeestack_$p/$nCFName") && $cDQuery) {
+                    echo success("REGISTERED SUCCESSFULLY");
+                }else{
+                    die(error("COMPANY REGISTERATION FAILED ").mysqli_error($conn));
+                };             
+              
+            }
+        }
+       
+    }  
+    
+    // RIDDER SETTLMENT UPDATE 
+    if (isset($_POST['rsU'])) {
+        $acn = checkForm($_POST['acn']);
+        $country = strtoupper(checkForm($_POST['country']));
+        $bank = checkForm($_POST['bank']);
+
+        if ($acn === "" OR $country === "" OR $bank === "") {
+            echo error("All field required");
+        }else{
+           // API CALL FOR SUB ACCOUNT 
+           $phone = $_SESSION['juPhone'];
+           $email =  $_SESSION['juEmail'];
+        
+
+           $uQuery = mysqli_query($conn, "SELECT * FROM rider WHERE userid=$userid");
+           
+           if (!$uQuery) {
+               die(error("FAILED: COMPANY INFORMATION ").mysqli_error($conn));
+           }else{
+               $row = mysqli_fetch_assoc($uQuery);
+               $address = $row['company_address'];
+               $company_name = $row['company_name'];
+
+               $curl = curl_init();
+
+               curl_setopt_array($curl, array(
+                CURLOPT_URL => "https://api.flutterwave.com/v3/subaccounts",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_POSTFIELDS =>"{\n    \"account_bank\": \"$bank\",\n    \"account_number\": \"$acn\",\n    \"business_name\": \"$company_name\",\n    \"business_email\": \"$email\",\n    \"business_contact\": \"$address\",\n    \"business_contact_mobile\": \"$phone\",\n    \"business_mobile\": \"09087930450\",\n    \"country\": \"$country\",\n    \"meta\": [\n        {\n            \"meta_name\": \"mem_adr\",\n            \"meta_value\": \"0x16241F327213\"\n        }\n    ],\n    \"split_type\": \"percentage\",\n    \"split_value\": 0.85\n}",
+                CURLOPT_HTTPHEADER => array(
+                    "Content-Type: application/json",
+                    "Authorization: Bearer FLWSECK-e5f055aa50071dc0c376a4703d7f7b97-X"
+                ),
+                ));
+
+                $response = curl_exec($curl);
+
+                curl_close($curl);
+                $res = json_decode($response, true);
+                
+                $status = $res['status'];
+                $message = $res['message'];
+                $data = $res['data'];
+                if ($status === 'success') {
+
+                    $account_number = $data['account_number'];
+                    $bank_code = $data['account_bank'];
+                    $full_name = $data['full_name'];
+                    $subaccount_id = $data['subaccount_id'];
+                    $bank_name  = $data['bank_name'];
+
+                    $sql = "UPDATE `rider` SET `account_number`='$account_number',`bank`='$bank_code',`account_name`='$full_name',`subaccount_id`='$subaccount_id',`country`='$country', bank_name='$bank_name'";
+                    $query = mysqli_query($conn, $sql);
+                    if (!$query) {
+                        die(error("COMPANY DETAILS UPDATE FAIL ").mysqli_error($conn));
+                    }else{
+                        echo success("DETAILS UPDATED SUCCESSFULLY");
+                    }
+                }else{
+                    $message = str_replace('A subaccount with the', 'account', $message);
+                    echo error($message);
+                }
+
+           }
+
+                
+        }
+        
+    }
+
+    if (isset($_POST['mRAS'])) {
+        $riderId = checkForm($_POST['riderId']);
+
+        // CHECK IF RIDER IS ALREADY ASSIGN 
+            $cMRQuery = mysqli_query($conn, "SELECT * FROM merchant_riders WHERE merchant_id=$userid");
+            if (!$cMRQuery) {
+                die(error("FAILED TO VERIFY ").mysqli_error($conn));
+            }else if (mysqli_num_rows($cMRQuery) > 0){
+                echo info("RIDER ALREADY ASSIGNED");
+            }else{
+
+           
+                if (!empty($riderId)) {
+                    // ASSIGN RIDER TO MERCHANT 
+                    $mRASQuery = mysqli_query($conn, "INSERT INTO `merchant_riders`( `merchant_id`, `rider_id`) VALUES ($userid, $riderId)");
+                    if (!$mRASQuery) {
+                        die(error("Fail ").mysqli_error($mRASQuery));
+                    }else{
+                        echo success("RIDER ASSIGN SUCCESSFULLY");
+                    }
+                }
+            }
+    }
+?>          
+ 

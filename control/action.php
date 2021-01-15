@@ -2,8 +2,7 @@
     require('./conn.php');
     require('./functions.php');
   if (isset($_POST['signup'])) {
-     
-      $fn =checkForm($_POST['fn']);
+      $fn = checkForm($_POST['fn']);
       $e = checkForm($_POST['e']);
       $p = checkForm($_POST['p']);
       $g = checkForm($_POST['g']);
@@ -25,7 +24,7 @@
         }else{
           // CHECK THE ACCOUNT TYPE 
           if ($t === 'merchant') {
-          // MERCHANT QUERY 
+            // MERCHANT QUERY 
              // SEND QUERY TO DATABASE 
 
             //  REGISTER QUERY 
@@ -38,7 +37,7 @@
              if (!$query) {
                die(error('QUERY FAILED ').mysqli_error($conn));
              }else{
-                  if ($sQuery == true) {
+                  if ($query == true) {
                     if (!file_exists("../users/sydeestack_$p")) {
                         mkdir("../users/sydeestack_$p", 0777, true);
                     }
@@ -70,12 +69,12 @@
             `users`
                 (`fullname`, `email`, `phone`, `gender`, `country`, `type`, `password`, `transaction_code`, `status`, `verification_code`) 
             VALUES 
-                ('$fn', '$e', '$p', '$g', '$c', '$t','$p', 'null', 'active', 'xtskeituuy')";
+                ('$fn', '$e', '$p', '$g', '$c', '$t','$hp', 'null', 'active', 'xtskeituuy')";
             $query = mysqli_query($conn, $sql);
             if (!$query) {
               die(error('QUERY FAILED ').mysqli_error($conn));
             }else{
-              if ($sQuery == true) {
+              if ($query == true) {
                 if (!file_exists("../users/sydeestack_$p")) {
                     mkdir("../users/sydeestack_$p", 0777, true);
                 }
@@ -116,8 +115,13 @@
                 echo success("VERIFY SUCCESSFULLY");
                 $id = $row['id'];
                 $type = $row['type'];
+                $phone = $row['phone'];
+                $email = $row['email'];
                 $_SESSION['juId'] = $id;
                 $_SESSION['juType'] = $type;
+                $_SESSION['juPhone'] = $phone;
+                $_SESSION['juEmail'] = $email;
+
                
               }else{
                 echo error("INVALID PASSWORD");
@@ -132,124 +136,89 @@
     
   }
 
-  if (isset($_POST['fetchSingleProduct'])) {
-    $pId = $_POST['fetchSingleProduct'];
-    $product_query = mysqli_query($conn, "SELECT * FROM product WHERE id=$pId");
-    if (!$product_query) {
-        die(error("ERROR LOADING PRODUCTS"));
-    }else if(mysqli_num_rows($product_query) > 0){
-      $row = mysqli_fetch_assoc($product_query);
-
-      $price = number_format($row['price']);
-      $name = ucwords($row['name']);
-      $description = $row['description'];
-      echo "<div class='cart-item'>
-      <p class='cart-name'>$name</p>
-      <div class='cart-image'>
-          <img src='./pics.png' alt='' class=''>
-      </div>
-      <div class='description mt-2'>
-        <h5>Details</h5>
-        <p>$description</p>
-      </div>
-      <div class='cart-item-checkout' id='cart-item-checkout'>
-          
-          <div class='add-to-cart' id='add-to-cart'>
-            <button class='btn btn-info btn-add-to-cart' name='btn-add-to-cart' id='$pId'>Add to Cart</button>
-          </div>
-          <div class='checkout' id='checkout'>
-            <button class='btn btn-success btn-checkout' name='btn-checkout' id='$pId'>Checkout</button>
-          </div>
-          <div>
-            <button class='btn btn-outline-dark' name='btn-like' id='$pId'><i class='fa fa-heart-o' aria-hidden='true'></i></button>
-          </div>
-      </div>
-  </div>";
-    }
-  }
+  
 
 
-    if (isset($_POST['singleCheckOut'])) {
-      $spId = $_POST['singleCheckOut'];
+    // if (isset($_POST['singleCheckOut'])) {
+    //   $spId = $_POST['singleCheckOut'];
 
-      // CHECK IF USER IS LOGIN 
-      if (isset($_SESSION['juId'])) {
+    //   // CHECK IF USER IS LOGIN 
+    //   if (isset($_SESSION['juId'])) {
        
-        $product_query = mysqli_query($conn, "SELECT * FROM product WHERE id=$spId");
-          if (!$product_query) {
-              die(error("ERROR LOADING PRODUCTS"));
-          }else if(mysqli_num_rows($product_query) > 0){
-            $row = mysqli_fetch_assoc($product_query);
-            $fPrice = number_format($row['price']);
-            $price = $row['price'];
-            $name = ucwords($row['name']);
-            $description = $row['description'];
-            $qty = 1;
+    //     $product_query = mysqli_query($conn, "SELECT * FROM product WHERE id=$spId");
+    //       if (!$product_query) {
+    //           die(error("ERROR LOADING PRODUCTS"));
+    //       }else if(mysqli_num_rows($product_query) > 0){
+    //         $row = mysqli_fetch_assoc($product_query);
+    //         $fPrice = number_format($row['price']);
+    //         $price = $row['price'];
+    //         $name = ucwords($row['name']);
+    //         $description = $row['description'];
+    //         $qty = 1;
 
-            // SET THE PRODUCT CART SESSION 
+    //         // SET THE PRODUCT CART SESSION 
               
-              if (isset($_SESSION['cart'])) {
-                // CHECK IF THE PRODUCT ALREADY EXIST IN THE ARRAY 
-                if (!array_key_exists ($spId, $_SESSION['cart'])) {
-                  $_SESSION['cart'][$spId] = $name;
-                }
+    //           if (isset($_SESSION['cart'])) {
+    //             // CHECK IF THE PRODUCT ALREADY EXIST IN THE ARRAY 
+    //             if (!array_key_exists ($spId, $_SESSION['cart'])) {
+    //               $_SESSION['cart'][$spId] = $name;
+    //             }
                  
-              }else{
-                // SET THE SESSION AND CREAT THE FIRST ARRAY 
-                $_SESSION['cart'] = array($spId => $name);
-              }
+    //           }else{
+    //             // SET THE SESSION AND CREAT THE FIRST ARRAY 
+    //             $_SESSION['cart'] = array($spId => $name);
+    //           }
             
-            echo "<div class='container'>
-            <form id='singleCheckOutForm'>
-                <div >
-                  <input type='text' id='price' value='$price' disabled hidden>
-                </div>
-                  <table class='table table-responsive'>
-                      <thead>
-                          <tr>
-                              <td>Image</td>
-                              <td>Product</td>
-                              <td>Price</td>
-                              <td>Quantity</td>
-                              <td>Total</td>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          <tr>
-                              <td> <img src='./pics.png' alt='$name' class='img-checkout'> </td>
-                              <td>$name</td>
-                              <td>N $fPrice</td>
-                              <td><input type='number' value='1' class='checkout-input' id='qty' min='1'></td>
-                              <td><input type='text' value='Total' class='checkout-input-total' id='total' disabled></td>
+    //         echo "<div class='container'>
+    //         <form id='singleCheckOutForm'>
+    //             <div >
+    //               <input type='text' id='price' value='$price' disabled hidden>
+    //             </div>
+    //               <table class='table table-responsive'>
+    //                   <thead>
+    //                       <tr>
+    //                           <td>Image</td>
+    //                           <td>Product</td>
+    //                           <td>Price</td>
+    //                           <td>Quantity</td>
+    //                           <td>Total</td>
+    //                       </tr>
+    //                   </thead>
+    //                   <tbody>
+    //                       <tr>
+    //                           <td> <img src='./pics.png' alt='$name' class='img-checkout'> </td>
+    //                           <td>$name</td>
+    //                           <td>N $fPrice</td>
+    //                           <td><input type='number' value='1' class='checkout-input' id='qty' min='1'></td>
+    //                           <td><input type='text' value='Total' class='checkout-input-total' id='total' disabled></td>
                               
-                          </tr>
-                          <tr>
-                            <td colspan='5'>
-                                <div class='form-group text-right'>
-                                <input type='submit' value='Checkout' class='btn btn-jumga'>
-                            </div>
-                            </td>
-                          </tr>
-                      </tbody>
-              </table>
+    //                       </tr>
+    //                       <tr>
+    //                         <td colspan='5'>
+    //                             <div class='form-group text-right'>
+    //                             <input type='submit' value='Checkout' class='btn btn-jumga'>
+    //                         </div>
+    //                         </td>
+    //                       </tr>
+    //                   </tbody>
+    //           </table>
               
-            </form>
-            </div>";
-          }else{
-              echo "PRODUCT NOT AVAILABLE AT THE MOMENT";
-          }
+    //         </form>
+    //         </div>";
+    //       }else{
+    //           echo "PRODUCT NOT AVAILABLE AT THE MOMENT";
+    //       }
 
 
-      }else{
-        echo "You are not login";
-      }
+    //   }else{
+    //     echo "You are not login";
+    //   }
       
-    }
+    // }
 
 
     if (isset($_POST['showCart']) && count($_SESSION['cart']) > 0) {
-          echo "
-                  <thead>
+          echo "<thead>
                   <tr>
                       <td>Image</td>
                       <td>Product</td>
@@ -286,23 +255,17 @@
 
         }
 
-        echo "
-          <td colspan='5'>
-          <div class='form-group text-right'>
-          <input type='submit' value='Checkout' class='btn btn-jumga'>
-      </div>
-      </td>
-    </tr>
-  </tbody>
-  </table>
-
-  </form>
-  </div>
+        echo "<td colspan='5'>
+                                <div class='form-group text-right'>
+                                <input type='submit' value='Checkout' class='btn btn-jumga'>
+                            </div>
+                            </td>
+                          </tr>
+                      </tbody>
+              </table>
+              
+            </form>
+            </div>
         ";
     }
   ?>
-
-
-  
-  
-  
