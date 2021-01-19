@@ -43,20 +43,20 @@
                     }
                   }
                $t_ref = $e."merchant_activation_fees";
-               echo "<span class='text-success'>Registered Successfully Click the button below or Login to Activate</span>";
+               echo "1 <span class='text-white'>Registered Successfully Click the button below or Login to Activate</span>";
                 echo "
                 <form method='POST' action='https://checkout.flutterwave.com/v3/hosted/pay'>
-                  <input type='hidden' name='public_key' value='FLWPUBK_TEST-58d949e27145d7b369efaf6099b62d61-X' />
+                  <input type='hidden' name='public_key' value='$tPublic' />
                   <input type='hidden' name='customer[email]' value='$e' />
                   <input type='hidden' name='customer[phone_number]' value='$p' />
                   <input type='hidden' name='customer[name]' value='$fn' />
                   <input type='hidden' name='tx_ref' value='$t_ref' />
-                  <input type='hidden' name='amount' value='200' />
+                  <input type='hidden' name='amount' value='2000' />
                   <input type='hidden' name='currency' value='NGN' />
                   <input type='hidden' name='meta[token]' value='54' />
                   <input type='hidden' name='redirect_url' value='http://localhost/jumga/pay.php' />
                   
-                  <button type='submit' class='btn btn-info'>Activate</button> 
+                  <button type='submit' class='btn btn-jumga'>Activate</button> 
                 </form>
                  
                 ";
@@ -117,10 +117,12 @@
                 $type = $row['type'];
                 $phone = $row['phone'];
                 $email = $row['email'];
+                $fullname = $row['fullname'];
                 $_SESSION['juId'] = $id;
                 $_SESSION['juType'] = $type;
                 $_SESSION['juPhone'] = $phone;
                 $_SESSION['juEmail'] = $email;
+                $_SESSION['juFullname'] =$fullname;
 
                
               }else{
@@ -139,133 +141,82 @@
   
 
 
-    // if (isset($_POST['singleCheckOut'])) {
-    //   $spId = $_POST['singleCheckOut'];
+if (isset($_POST['singleCheckOut'])) {
+$spId = $_POST['singleCheckOut'];
 
-    //   // CHECK IF USER IS LOGIN 
-    //   if (isset($_SESSION['juId'])) {
-       
-    //     $product_query = mysqli_query($conn, "SELECT * FROM product WHERE id=$spId");
-    //       if (!$product_query) {
-    //           die(error("ERROR LOADING PRODUCTS"));
-    //       }else if(mysqli_num_rows($product_query) > 0){
-    //         $row = mysqli_fetch_assoc($product_query);
-    //         $fPrice = number_format($row['price']);
-    //         $price = $row['price'];
-    //         $name = ucwords($row['name']);
-    //         $description = $row['description'];
-    //         $qty = 1;
+// CHECK IF USER IS LOGIN 
+if (isset($_SESSION['juId'])) {
 
-    //         // SET THE PRODUCT CART SESSION 
-              
-    //           if (isset($_SESSION['cart'])) {
-    //             // CHECK IF THE PRODUCT ALREADY EXIST IN THE ARRAY 
-    //             if (!array_key_exists ($spId, $_SESSION['cart'])) {
-    //               $_SESSION['cart'][$spId] = $name;
-    //             }
-                 
-    //           }else{
-    //             // SET THE SESSION AND CREAT THE FIRST ARRAY 
-    //             $_SESSION['cart'] = array($spId => $name);
-    //           }
-            
-    //         echo "<div class='container'>
-    //         <form id='singleCheckOutForm'>
-    //             <div >
-    //               <input type='text' id='price' value='$price' disabled hidden>
-    //             </div>
-    //               <table class='table table-responsive'>
-    //                   <thead>
-    //                       <tr>
-    //                           <td>Image</td>
-    //                           <td>Product</td>
-    //                           <td>Price</td>
-    //                           <td>Quantity</td>
-    //                           <td>Total</td>
-    //                       </tr>
-    //                   </thead>
-    //                   <tbody>
-    //                       <tr>
-    //                           <td> <img src='./pics.png' alt='$name' class='img-checkout'> </td>
-    //                           <td>$name</td>
-    //                           <td>N $fPrice</td>
-    //                           <td><input type='number' value='1' class='checkout-input' id='qty' min='1'></td>
-    //                           <td><input type='text' value='Total' class='checkout-input-total' id='total' disabled></td>
-                              
-    //                       </tr>
-    //                       <tr>
-    //                         <td colspan='5'>
-    //                             <div class='form-group text-right'>
-    //                             <input type='submit' value='Checkout' class='btn btn-jumga'>
-    //                         </div>
-    //                         </td>
-    //                       </tr>
-    //                   </tbody>
-    //           </table>
-              
-    //         </form>
-    //         </div>";
-    //       }else{
-    //           echo "PRODUCT NOT AVAILABLE AT THE MOMENT";
-    //       }
+  $product_query = mysqli_query($conn, "SELECT * FROM product WHERE id=$spId");
+    if (!$product_query) {
+        die(error("ERROR LOADING PRODUCTS"));
+    }else if(mysqli_num_rows($product_query) > 0){
+      $row = mysqli_fetch_assoc($product_query);
+      $fPrice = number_format($row['price']);
+      $price = $row['price'];
+      $name = ucwords($row['name']);
+      $description = $row['description'];
+      $qty = 1;
 
-
-    //   }else{
-    //     echo "You are not login";
-    //   }
-      
-    // }
-
-
-    if (isset($_POST['showCart']) && count($_SESSION['cart']) > 0) {
-          echo "<thead>
-                  <tr>
-                      <td>Image</td>
-                      <td>Product</td>
-                      <td>Price</td>
-                      <td>Quantity</td>
-                      <td>Total</td>
-                  </tr>
-              </thead>
-              <tbody>
-          ";
-        foreach ($_SESSION['cart'] as $key => $value) {
-             $pId = $key;
-             $product_query = mysqli_query($conn, "SELECT * FROM product WHERE id=$pId");
-          if (!$product_query) {
-              die(error("ERROR LOADING PRODUCTS"));
-          }else if(mysqli_num_rows($product_query) > 0){
-            $row = mysqli_fetch_assoc($product_query);
-            $fPrice = number_format($row['price']);
-            $price = $row['price'];
-            $name = ucwords($row['name']);
-            $description = $row['description'];
-            $qty = 1;
-            echo "
-                          <tr>
-                              <td> <img src='./pics.png' alt='$name' class='img-checkout'> </td>
-                              <td>$name</td>
-                              <td>N $fPrice</td>
-                              <td><input type='number' value='1' class='checkout-input' id='qty' min='1'></td>
-                              <td><input type='text' value='Total' class='checkout-input-total' id='total' disabled></td>
-                              
-                          </tr>
-                          <tr>";
+      // SET THE PRODUCT CART SESSION 
+        
+        if (isset($_SESSION['cart'])) {
+          // CHECK IF THE PRODUCT ALREADY EXIST IN THE ARRAY 
+          if (!array_key_exists ($spId, $_SESSION['cart'])) {
+            $_SESSION['cart'][$spId] = $name;
           }
-
+            
+        }else{
+          // SET THE SESSION AND CREAT THE FIRST ARRAY 
+          $_SESSION['cart'] = array($spId => $name);
         }
-
-        echo "<td colspan='5'>
-                                <div class='form-group text-right'>
-                                <input type='submit' value='Checkout' class='btn btn-jumga'>
-                            </div>
-                            </td>
-                          </tr>
-                      </tbody>
-              </table>
-              
-            </form>
-            </div>
-        ";
+      
+      echo "<div class='container'>
+      <form id='singleCheckOutForm'>
+          <div >
+            <input type='text' id='price' value='$price' disabled hidden>
+          </div>
+            <table class='table table-responsive'>
+                <thead>
+                    <tr>
+                        <td>Image</td>
+                        <td>Product</td>
+                        <td>Price</td>
+                        <td>Quantity</td>
+                        <td>Total</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td> <img src='./pics.png' alt='$name' class='img-checkout'> </td>
+                        <td>$name</td>
+                        <td>N $fPrice</td>
+                        <td><input type='number' value='1' class='checkout-input' id='qty' min='1'></td>
+                        <td><input type='text' value='Total' class='checkout-input-total' id='total' disabled></td>
+                        
+                    </tr>
+                    <tr>
+                      <td colspan='5'>
+                          <div class='form-group text-right'>
+                          <input type='submit' value='Checkout' class='btn btn-jumga'>
+                      </div>
+                      </td>
+                    </tr>
+                </tbody>
+        </table>
+        
+      </form>
+      </div>";
+    }else{
+        echo "PRODUCT NOT AVAILABLE AT THE MOMENT";
     }
-  ?>
+
+
+  }else{
+  echo "You are not login";
+  }
+
+}
+
+
+  

@@ -20,21 +20,28 @@
                     echo '<div class="cart-category" id="category-id">';
                     // echo "<h3>$title</h3>";
                     while ($row = mysqli_fetch_assoc($product_query)) {
-                        $row['id'];
+                        $p_id = $row['id'];
                         $price = number_format($row['price']);
                         $name = ucwords($row['name']);
-
+                        $image = $row['images'];
+                        $uId = $row['user_id'];
+                              
+                        $uIQuery = mysqli_query($conn, "SELECT * FROM users WHERE id=$uId");
+                        if (!$uIQuery) {
+                            die("PUID FAILED ");
+                        }
+                        $p = mysqli_fetch_assoc($uIQuery)['phone'];
                         echo "<div class='cart-item'>
                         <p class='cart-name'>$name</p>
                         <div class='cart-image'>
-                            <img src='./pics.png' alt='' class=''>
+                            <img src='../users/sydeestack_$p/$image' alt='' class=''>
                         </div>
                         
                         <div class='cart-item-details'>
-                            <div class='price'>N $price</div>
-                            <div class='title'></div>
-                            <div class='more'><a id='$id' name='more'>More</a></div>
-                        </div>
+                        <div class='price'>N $price</div>
+                        <div class='title'></div>
+                        <div class='more'><a href='../?p=more&i=$p_id' id='$p_id' name='more'>More</a></div>
+                    </div>
                     </div>";
 
                     }

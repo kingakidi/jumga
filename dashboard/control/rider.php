@@ -10,6 +10,9 @@
         <div>
             <a name='p-link' class="item-link" id="settlement">Settlement Information</a>
         </div>
+        <div>
+            <a name='p-link' class="item-link" id="orders">Delivery Orders</a>
+        </div>
       
     </div>
     <div class="show-item mt-3" id="show-item">

@@ -205,6 +205,19 @@ plink.forEach(
                         }
                     }
                 )
+            }else if(id === 'orders'){
+                           console.log(id)
+                $.ajax({
+                    url: './control/action.php', 
+                    method: "POST",
+                    data: {
+                        deliveryRequest: 'deliveryRequest'
+                    },
+                    success: function (data) {
+                        slv.innerHTML = data;
+                    }
+
+                })
             }
         }
     }

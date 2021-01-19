@@ -36,7 +36,7 @@ let bs = _('btn-submit')
 
 sf.addEventListener('submit', function (event) {
     event.preventDefault();
-    if (check(fn) && check(e) && check(p) && check(g) && check(c) && check(t)) {
+    if (check(fn) > 0 && check(e) > 0 && check(p) > 0 && check(g) > 0 && check(c) > 0 && check(t) > 0) {
     
         $.ajax({
             type: 'POST',
@@ -57,10 +57,27 @@ sf.addEventListener('submit', function (event) {
                bs.disabled = true;
             }, 
             success: function (data) {
-                se.innerHTML = data;
-                se.style.visibility = 'visible'
-                bs.innerHTML = 'Signup' 
-                bs.disabled = false;
+              
+                if (data.trim().charAt(0) === "1" ) {
+
+                    str = data.trim().substring(1);
+                    bs.disabled = false;
+                    _('container-signup').innerHTML = str;
+                    _('container-signup').style.width = "400px";
+                    _('container-signup').style.height = "400px";
+                    _('container-signup').style.backgroundColor = "#e6b043";
+                    _('container-signup').style.padding = "40px";
+                    _('container-signup').style.fontSize = "20px";
+                    _('container-signup').style.color = "#fff";
+
+
+                }else{
+                    se.innerHTML = data;
+                    se.style.visibility = 'visible'
+                    bs.innerHTML = 'Signup' 
+                    bs.disabled = false;
+                }
+                
             }
         })
     }else{

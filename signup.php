@@ -25,38 +25,33 @@ ob_start();
 </head>
 <body>
     
-    <div class="row m-5">
-        <div class="col-sm">
-            <h1 class="text-center">JUMGA</h1>
+    <div class="" id="signup-container">
+        <div class="">
+            <h2 class="text-center signup-header">JUMGA</h2>
         </div>
-        <div class="col-sm">
+        <div class="" id="container-signup">
             <form class="signup" id="signup">
                 <div class="form-group">
-                    <label for="fullname">Fullname <sup class="text-danger">*</sup></label>
-                    <input type="text" class="form-control" class="fullname" id="fullname" placeholder="Fullname">
-                    <!-- <div class="error fullname-error" id="fullname-error"></div> -->
+                    <input type="text" class="form-control" class="fullname" id="fullname" placeholder="Full name">
+               
                 </div>
                 <div class="form-group">
-                    <label for="email">Email Address <sup class="text-danger">*</sup></label>
                     <input type="email" name="email" id="email" class="form-control email" placeholder="Email Address">
-                    <!-- <div class="error email-error" id="email-error"></div> -->
+                  
                 </div>
                 <div class="form-group">
-                    <label for="phone">Phone Number <sup class="text-danger">*</sup></label>
                     <input type="number" placeholder="Phone Number" id="phone" class="form-control number">
-                    <!-- <div class="error phone-error" id="phone-error"></div> -->
+                 
                 </div>
                 <div class="form-group">
-                    <label for="gender">Gender <sup class="text-danger">*</sup></label>
                     <select name="gender" id="gender" class="select form-control">
                         <option value="" disabled selected>Gender</option>
                         <option value="m">Male</option>
                         <option value="f">Female</option>
                     </select>
-                    <!-- <div class="error gender-error" id="gender-error"></div> -->
+                 
                 </div>
                 <div class="form-group">
-                    <label for="country">Country <sup class="text-danger">*</sup></label>
                     <select name="country" id="country" class="form-control select">
                         <option value="" selected disabled>Select Country</option>
                         <option value="nigeria">Nigeria</option>
@@ -64,42 +59,40 @@ ob_start();
                         <option value="kenya">Kenya</option>
                         <option value="uk">UK</option>
                     </select>
-                    <!-- <div class="error country-error" id="country-error"></div> -->
+                  
                 </div>
                 <div class="form-group">
-                    <label for="type">Account Type <sup class="text-danger">*</sup></label>
                     <select name="account-type" id="type" class="select form-control account-type">
                         <option value="" selected disabled>Select Type</option>
                         <option value="buyer">Buyer</option>
                         <option value="merchant">Merchant</option>
                         <option value="rider">Rider</option>
                     </select>
-                    <!-- <div class="error type-error" id="type-error"></div> -->
+                    
                 </div>
                 <div class="form-group">
-                    <label for="password">Password <sup class="text-danger">*</sup></label>
                     <input type="password" name="password" id="password" class="form-control password" placeholder="Password">
-                    <!-- <div class="error password-error" id="password-error"></div> -->
 
                 </div>
                 
                 <div class="row">
                     <div class="col-sm">
                         <div class="form-group">
-                            <a href="./login.php">Already has an Account?</a>
+                            <a href="./login.php" class="text-white">Already has an Account?</a>
                         </div>
                     </div>
                     <div class="col-sm">
                         <div class="form-group text-right">
                 
-                            <button type="submit" class="btn btn-info" id="btn-submit">
+                            <button type="submit" class="btn btn-jumga" id="btn-submit">
                             Signup
                             </button>
                         </div>
                     </div>
                 </div>
+                <div class="signup-error text-center text-white" id="signup-error"></div>
             </form>
-            <div class="error singup-error" id="signup-error"></div>
+            
         </div>
     </div>
     <script src="./vendor/jquery/jquery.min.js"></script>

@@ -18,7 +18,8 @@
 </head>
 <body>
     <?php 
-    // print_r($_SESSION['cart']);
+   
+  
       
     ?>
 
@@ -26,10 +27,15 @@
         <nav>
            
             <div class="link">
-                             
+                <button class="btn">
+                    <span>
+                    
+                            <a href="index.php"><i class="fa fa-shopping-cart" aria-hidden="true"></i> Home</a>
+                        </span>
+                </button>
                 <button class="btn" id="btn-show-cart-number">  
                     <span >
-                        <a href="" id="link-show-cart-number"> <i class="fa fa-shopping-cart" aria-hidden="true"></i> My Cart
+                        <a href="?p=cart" id="link-show-cart-number"> <i class="fa fa-shopping-cart" aria-hidden="true"></i> My Cart
                         
                         <?php
                             if (isset($_SESSION['cart'])) {
@@ -48,20 +54,15 @@
                         <button class="btn">
                 
                         <span>
-                            <a href=""><i class="fa fa-truck" aria-hidden="true"></i>  Orders</a>
+                            <a href="./dashboard/?p=purchase"><i class="fa fa-truck" aria-hidden="true"></i>  Orders</a>
                         </span>
                     </button>
                     <button class="btn">
                     <span>
-                     <a href=""><i class="fa fa-money" aria-hidden="true"></i> Sell on JUMGA</a>
+                     <a href="./signup.php"><i class="fa fa-money" aria-hidden="true"></i> Sell on JUMGA</a>
                         </span>
                     </button>
-                    <button class="btn">
-                    <span>
-                    
-                            <a href=""><i class="fa fa-shopping-cart" aria-hidden="true"></i> Physical Store</a>
-                        </span>
-                    </button>';
+                   ';
                     }
 
                 ?>
@@ -133,8 +134,6 @@
 
                         
                     ?>
-
-                    
                 </div>
             </div>
         </div>
@@ -147,17 +146,19 @@
             </div>
            
             <div class="popup-show" id="popup-show">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia fugit, hic voluptates sapiente impedit iure laboriosam est natus incidunt vel blanditiis suscipit nisi architecto officiis nostrum nulla dolor, porro minima? Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quisquam, fuga eligendi nam quia adipisci pariatur saepe perspiciatis ipsam esse, voluptates consequatur dolore nulla qui molestias veritatis deserunt. Error, nisi suscipit.
-                Ratione porro sunt consequatur provident. Cupiditate necessitatibus sit voluptates, quos, odio obcaecati fugit optio voluptas quis tenetur libero vero, magnam cum reiciendis quas eligendi fuga adipisci est quod natus id.
-                Ex quidem error ipsa sunt recusandae, quas quod voluptatum ad ipsum quisquam vel officiis nostrum delectus nam sapiente autem magnam mollitia nobis consequatur. Modi, corporis! Illo odio corrupti officiis reprehenderit.
-                Quaerat, veritatis. Maiores nam est amet repellendus quas ipsum distinctio id placeat culpa consequuntur eaque ipsa, quisquam mollitia obcaecati, repellat voluptate incidunt, labore nostrum? Dolore possimus excepturi nihil amet placeat!
-                Eos commodi aut voluptatibus minima culpa alias delectus, excepturi pariatur, est magnam nemo ducimus molestias sint! Inventore doloremque accusamus praesentium quo sed repudiandae nobis, modi maxime minima neque ea libero? Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem, quaerat nihil! Veniam perspiciatis nobis sunt hic magni dolore nemo laboriosam cupiditate? Nam, incidunt porro. Soluta, quo minus? Magni, iure sint.
+                
             </div>
         </div>
     </div>
     <script src="./vendor/jquery/jquery.js"></script>
     <script src="./js/sydeestack.js"></script>
-    <!-- <script src="./index.js"></script> -->
+    <?php
+        if (isset($_GET['p'])) {
+            $p = $_GET['p'];
+            echo "<script src='./js/$p.js'></script>";
+        }
+    ?>
+
    
 
 </body>

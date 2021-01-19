@@ -304,3 +304,14 @@ img{
   .show > .btn-jumga.dropdown-toggle:focus {
     box-shadow: 0 0 0 0.2rem rgba(177,28,177, 0.5);
   }
+
+  @media (max-width: 550px){
+      .content{
+          flex-direction: column;
+      }
+      .sidebar{
+          display: flex;
+          flex: 1;
+          flex-wrap: wrap;
+      }
+  }

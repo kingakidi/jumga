@@ -141,3 +141,8 @@ img{
     visibility: hidden;
     text-transform: uppercase;
 }
+
+.btn-jumga-inverse{
+    background-color: #fff;
+    color: #e6b043;
+}

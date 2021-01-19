@@ -2387,9 +2387,9 @@ textarea.form-control {
   user-select: none;
   background-color: transparent;
   border: 1px solid transparent;
-  padding: 0.29rem 0.65rem;
-  font-size: 0.7rem;
-  line-height: 1.3;
+  padding: 0.31rem 0.7rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
   border-radius: 0.23rem;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }

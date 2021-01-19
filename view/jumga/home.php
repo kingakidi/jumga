@@ -26,11 +26,19 @@
                                 $p_id = $row['id'];
                                 $price = number_format($row['price']);
                                 $name = ucwords($row['name']);
-
+                                $image = $row['images'];
+                                $uId = $row['user_id'];
+                              
+                                $uIQuery = mysqli_query($conn, "SELECT * FROM users WHERE id=$uId");
+                                if (!$uIQuery) {
+                                    die("PUID FAILED ");
+                                }
+                                $p = mysqli_fetch_assoc($uIQuery)['phone'];
+                            
                                 echo "<div class='cart-item'>
-                                <p class='cart-name'>$name</p>
+                                <p class='cart-name'><strong>$name </strong></p>
                                 <div class='cart-image'>
-                                    <img src='./pics.png' alt='' class=''>
+                                    <img src='./users/sydeestack_$p/$image' alt='' class=''>
                                 </div>
                                 
                                 <div class='cart-item-details'>

@@ -8,7 +8,7 @@ ob_start();
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JUMGA LOGIN</title>
     <link rel="apple-touch-icon" sizes="180x180" href="./favicon/apple-touch-icon.png">
@@ -23,13 +23,15 @@ ob_start();
 </head>
 <body>
  
-        <div class="row m-5">
-            <div class="col-sm">
-                <h1 class="text-center">
+        <div class="" id="login-container">
+            <div >
+             
+                <h2 class="text-center login-header">
                     JUMGA
-                </h1>
+                </h2>
             </div>
-            <div class="col-sm">
+            <div class="">
+                
                 <form class="login-form" id="login">
                     <div class="form-group">
                         <input type="text" class="username form-control" id="username" placeholder="Email Address or Phone Number">
@@ -37,23 +39,22 @@ ob_start();
                     <div class="form-group">
                         <input type="password" name="password" id="password" class="form-control" placeholder="Password">
                     </div>
-                    <div class="error singup-error" id="login-error"></div>
-                       <div class="row">
-                           <div class="col-sm">
-                               <div>
-                                <a href="./signup.php">Create Account</a>
-                               </div>
-                         
+                   
+                    <div class="row">
+                        <div class="col-sm">
+                            
+                            <a href="./signup.php" class="text-white">Don't have an Account?</a>
                         </div>
-                        
-                            <div class="form-group text-right">
-                                <button type="submit" class="btn btn-info" id="btn-login">
-                                Login
-                                </button>
-                            </div>
+                    
+                        <div class="form-group text-right col-sm">
+                            <button type="submit" class="btn btn-jumga" id="btn-login">
+                            Login
+                            </button>
                         </div>
-                
                     </div>
+                    <div class="error singup-error text-center" id="login-error"></div>
+                    </div>
+                   
                 </form>
             </div>
         </div>

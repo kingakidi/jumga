@@ -7,8 +7,15 @@
         $price = checkForm($_POST['price']);
         $cat = checkForm($_POST['cat']);
         $qty = checkForm($_POST['qty']);
-        if (!empty($name) && !empty($des) && !empty($price) && !empty($cat) && !empty($qty)) {
-        //    CHECK IF PRODUCT ALREADY EXIST WITH THE SAME MERCHANT 
+
+        $fName = $_FILES['image']['name'];
+        $size = $_FILES['image']['size'];
+        $type = $_FILES['image']['type'];
+        $tmp = $_FILES['image']['tmp_name'];
+
+        
+        if (!empty($name) && !empty($des) && !empty($price) && !empty($cat) && !empty($qty) && !empty($_FILES['image'])) {
+            //    CHECK IF PRODUCT ALREADY EXIST WITH THE SAME MERCHANT 
                 $pCQuery = mysqli_query($conn, "SELECT * FROM `product` WHERE product.name='$name' AND product.user_id='$userid'");
                 if (!$pCQuery) {
                     die(error("Product Verification Failed ").mysqli_error($conn));
@@ -17,13 +24,25 @@
                     if (mysqli_num_rows($pCQuery) > 0) {
                         echo error("YOU HAVE ALREADY ADD THIS PRODUCT");
                     }else{
-                        // INSERT THE PRODUCT INTO DB
-                        $sql = "INSERT INTO `product`(`user_id`, `name`, `description`, `category_id`, `qty`, `price`, `images`) VALUES ($userid, '$name', '$des', $cat, $qty, $price,'product.jpg')";
-                        if (!mysqli_query($conn, $sql)) {
-                            die(error("Production upload failed try again ".mysqli_error($conn)));
+                        $ext = pathinfo($fName, PATHINFO_EXTENSION);
+                        
+                        $nCFName = $userid."_".$name."_".date("Y-m-d").".".$ext;
+                        $cd = dirname(__DIR__, 2);
+                        $p = $_SESSION['juPhone'];
+         
+                        if (move_uploaded_file($tmp, $cd."/users/sydeestack_$p/$nCFName")) {
+                            // INSERT THE PRODUCT INTO DB
+                            $sql = "INSERT INTO `product`(`user_id`, `name`, `description`, `category_id`, `qty`, `price`, `images`) VALUES ($userid, '$name', '$des', $cat, $qty, $price,'$nCFName')";
+                            if (!mysqli_query($conn, $sql)) {
+                                die(error("Production upload failed try again ".mysqli_error($conn)));
+                            }else{
+                                echo info("Product Added successfully");
+                            }
+                            
                         }else{
-                            echo info("Product Added successfully");
-                        }
+                            die(error("UNABLE TO UPLOAD PRODUCT "));
+                        };    
+                        
 
 
                     }
@@ -38,7 +57,7 @@
 
     if (isset($_POST['allProducts'])) {
         
-        $aPQuery = mysqli_query($conn, "SELECT * FROM product");
+        $aPQuery = mysqli_query($conn, "SELECT * FROM product ORDER BY date DESC");
         if (!$aPQuery) {
             die(error("PRODUCT FETCH FAILS ".mysqli_error($conn)));
         }else if(mysqli_num_rows($aPQuery) < 1){
@@ -66,22 +85,43 @@
             $sn = 1;
             while ($row = mysqli_fetch_assoc($aPQuery)) {
                 $mid = $row['user_id'];
+                
                 $n = $row['name'];
-                $des = $row['description'];
+                $des = truncate($row['description']);
                 $p = $row['price'];
                 $q = $row['qty'];
                 $c = $row['category_id'];
                 $image = $row['images'];
                 $date = $row['date'];
 
+                // GET THE MERCHANT STORE NAME 
+                    $msNameQuery = mysqli_query($conn, "SELECT * FROM profile WHERE userid=$mid");
+                    $msName = mysqli_fetch_assoc($msNameQuery)['trading_name'];
+                    
+
+                // GET THE CATEGORY  
+                $catQuery = mysqli_query($conn, "SELECT * FROM category WHERE id=$c");
+                if (!$catQuery) {
+                    die(error("FAIL: ITEM CATEGORY"));
+                }
+                $catName = ucwords(mysqli_fetch_assoc($catQuery)['title']);
+                $image = $row['images'];
+                $date = $row['date'];
+                // FETCH PRODUCT IMAGE 
+
+                $uIQuery = mysqli_query($conn, "SELECT * FROM users WHERE id=$userid");
+                if (!$uIQuery) {
+                    die("PRODUCT  FAILED ");
+                }
+                $p = mysqli_fetch_assoc($uIQuery)['phone'];
                 echo "<tr>
                 <td>$sn</td>
-                <td>$mid</td>
+                <td>$msName</td>
                 <td>$n</td>
                 <td>$des</td>
                 <td>$p</td>
                 <td>$q</td>
-                <td>$image</td>
+                <td> <img src='../users/sydeestack_$p/$image' alt='' style='width: 40px; height: 40px'></td>
                 <td>$c</td>
                 <td>$date</td>
                 <td>Action</td>
@@ -94,14 +134,210 @@
         }
     }
 
-    ?>
+
+    // FETCH MERCHANTS SALES  
+    if (isset($_POST['mySales'])) {
+        $uId = $_SESSION['juId'];
+        // GET THE MERCHANT ID         
+        $mIdQuery = mysqli_query($conn, "SELECT * FROM profile WHERE userid=$uId");
+                if (!$mIdQuery) {
+                    die('MERCHANT INFO FAILED ');
+                }else{
+                    $merchantId = ucwords(mysqli_fetch_assoc($mIdQuery)['id']);
+                }
+        
+       
+        $pQuery = mysqli_query($conn, "SELECT * FROM `transaction` WHERE merchant_id =$merchantId ORDER BY date DESC");
+    
+      
+        if (!$pQuery) {
+            die("UNABLE TO GET YOUR PURCHASE ");
+            exit();
+        }
+    
+        if (mysqli_num_rows($pQuery) < 1) {
+            echo '<div class="text-center text-info">You have no purchase record at the moment </div>';
+        }else{
+            echo '
+                <table class="table table-bordered table-responsive">
+                <thead>
+                    <th>S/N</th>
+                    <th>Item Name </th>
+                    <th>Store Name</th>
+                    <th>Delivery Company</th>
+                    <th>Qty</th>
+                    <th>Transaction ID</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </thead>
+                <tbody>
+    
+            ';
+            $sn = 1;
+            while ($row = mysqli_fetch_assoc($pQuery)) {
+                // echo "<pre>";
+                // print_r($row);
+                // echo "</pre>";
+                $mId = $row['merchant_id'];
+                $rId = $row['rider_id'];
+                $qty = $row['qty'];
+                $pId = $row['product_id'];
+                $tId = $row['trasaction_id'];
+                $date = $row['date'];
+               
+                // echo "$mId $rId $qty $pId $tId $date";
+                // GET THE MERCHANT NAME 
+                $mQuery = mysqli_query($conn, "SELECT * FROM profile WHERE id=$mId");
+                if (!$mQuery) {
+                    die('MERCHANT INFO FAILED ');
+                }else{
+                    $mName = ucwords(mysqli_fetch_assoc($mQuery)['trading_name']);
+                }
+               
+               
+                // GET THE DELIVERY NAME 
+                $rQuery = mysqli_query($conn, "SELECT * FROM rider WHERE id=$rId");
+                if (!$rQuery) {
+                    die("DELIVERY COMPANY FAILED ".mysqli_error($conn));
+                 
+                }else{
+                    $rName = ucwords(mysqli_fetch_assoc($rQuery)['company_name']);
+                }
+                // // GET THE PRODUCT NAME 
+                $productQuery = mysqli_query($conn, "SELECT * FROM product WHERE id=$pId");
+                if (!$productQuery) {
+                    die("PRODUCT FAILED ".mysqli_error($conn));
+                 
+                }else{
+                    $pName = ucwords(mysqli_fetch_assoc($productQuery)['name']);
+                }  
+                echo "
+                    <tr>
+                        <td>$sn</td>
+                        <td>$pName</td>
+                        <td>$mName</td>
+                        <td>$rName</td>
+                        <td>$qty</td>
+                        <td>$tId</td>
+                        <td>$date</td>
+                        <td>Delivery Status</td>
+                    </tr>";    
+                    $sn++;     
+            }
+            echo "
+                </tbody>
+                </table>
+                ";
+        }
+
+
+    }
+
+    // FETCH DELIVERY REQUEST 
+    if (isset($_POST['deliveryRequest'])) {
+        $uId = $_SESSION['juId'];
+        // GET THE MERCHANT ID         
+        $rIdQuery = mysqli_query($conn, "SELECT * FROM rider WHERE userid=$uId");
+                if (!$rIdQuery) {
+                    die('RIDER INFO FAILED ');
+                }else{
+                    $riderId = ucwords(mysqli_fetch_assoc($rIdQuery)['id']);
+                }
+        
+       
+        $pQuery = mysqli_query($conn, "SELECT * FROM `transaction` WHERE rider_id =$riderId ORDER BY date DESC");
+    
+      
+        if (!$pQuery) {
+            die("UNABLE TO GET YOUR PURCHASE ");
+            exit();
+        }
+    
+        if (mysqli_num_rows($pQuery) < 1) {
+            echo '<div class="text-center text-info">You have no purchase record at the moment </div>';
+        }else{
+            echo '
+                <table class="table table-bordered table-responsive">
+                <thead>
+                    <th>S/N</th>
+                    <th>Item Name </th>
+                    <th>Store Name</th>
+                    <th>Delivery Company</th>
+                    <th>Qty</th>
+                    <th>Transaction ID</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </thead>
+                <tbody>
+    
+            ';
+            $sn = 1;
+            while ($row = mysqli_fetch_assoc($pQuery)) {
+                // echo "<pre>";
+                // print_r($row);
+                // echo "</pre>";
+                $mId = $row['merchant_id'];
+                $rId = $row['rider_id'];
+                $qty = $row['qty'];
+                $pId = $row['product_id'];
+                $tId = $row['trasaction_id'];
+                $date = $row['date'];
+               
+                // echo "$mId $rId $qty $pId $tId $date";
+                // GET THE MERCHANT NAME 
+                $mQuery = mysqli_query($conn, "SELECT * FROM profile WHERE id=$mId");
+                if (!$mQuery) {
+                    die('MERCHANT INFO FAILED ');
+                }else{
+                    $mName = ucwords(mysqli_fetch_assoc($mQuery)['trading_name']);
+                }
+               
+               
+                // GET THE DELIVERY NAME 
+                $rQuery = mysqli_query($conn, "SELECT * FROM rider WHERE id=$rId");
+                if (!$rQuery) {
+                    die("DELIVERY COMPANY FAILED ".mysqli_error($conn));
+                 
+                }else{
+                    $rName = ucwords(mysqli_fetch_assoc($rQuery)['company_name']);
+                }
+                // // GET THE PRODUCT NAME 
+                $productQuery = mysqli_query($conn, "SELECT * FROM product WHERE id=$pId");
+                if (!$productQuery) {
+                    die("PRODUCT FAILED ".mysqli_error($conn));
+                 
+                }else{
+                    $pName = ucwords(mysqli_fetch_assoc($productQuery)['name']);
+                }  
+                echo "
+                    <tr>
+                        <td>$sn</td>
+                        <td>$pName</td>
+                        <td>$mName</td>
+                        <td>$rName</td>
+                        <td>$qty</td>
+                        <td>$tId</td>
+                        <td>$date</td>
+                        <td>Delivery Status</td>
+                    </tr>";    
+                    $sn++;     
+            }
+            echo "
+                </tbody>
+                </table>
+                ";
+        }
+
+
+    }
+?>
     
     <?php
+    
     // MY PRODUCTS 
-
-            if (isset($_POST['myProducts'])) {
+    if (isset($_POST['myProducts'])) {
                 
-                $aPQuery = mysqli_query($conn, "SELECT * FROM product WHERE user_id=$userid");
+                $aPQuery = mysqli_query($conn, "SELECT * FROM product WHERE user_id=$userid ORDER BY date DESC");
                 if (!$aPQuery) {
                     die(error("PRODUCT FETCH FAILS ".mysqli_error($conn)));
                 }else if(mysqli_num_rows($aPQuery) < 1){
@@ -123,27 +359,46 @@
                     </tr>
                 </thead>
                 <tbody>
-        <?php
+            <?php
                     // BRING PRODUCTS TABLES 
                     $sn = 1;
                     while ($row = mysqli_fetch_assoc($aPQuery)) {
                         $mid = $row['user_id'];
-                        $n = $row['name'];
+                        $n = strtoupper($row['name']);
                         $des = $row['description'];
-                        $p = $row['price'];
+                        $tDes = truncate($des);
+                        $price = $row['price'];
                         $q = $row['qty'];
+                        
                         $c = $row['category_id'];
+
+                        // GET THE CATEGORY  
+                        $catQuery = mysqli_query($conn, "SELECT * FROM category WHERE id=$c");
+                        if (!$catQuery) {
+                            die(error("FAIL: ITEM CATEGORY"));
+                        }
+
+
+
+                        $catName = ucwords(mysqli_fetch_assoc($catQuery)['title']);
                         $image = $row['images'];
                         $date = $row['date'];
+                        // FETCH PRODUCT IMAGE 
 
+                        $uIQuery = mysqli_query($conn, "SELECT * FROM users WHERE id=$userid");
+                        if (!$uIQuery) {
+                            die("PRODUCT  FAILED ");
+                        }
+                        $p = mysqli_fetch_assoc($uIQuery)['phone'];
+                        
                         echo "<tr>
                         <td>$sn</td>
                         <td>$n</td>
-                        <td>$des</td>
-                        <td>$p</td>
+                        <td>$tDes</td>
+                        <td>$price</td>
                         <td>$q</td>
-                        <td>$image</td>
-                        <td>$c</td>
+                        <td> <img src='../users/sydeestack_$p/$image' alt='' style='width: 40px; height: 40px'></td>
+                        <td>$catName</td>
                         <td>$date</td>
                         <td>Action</td>
                     </tr>";
@@ -250,7 +505,7 @@
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "GET",
             CURLOPT_HTTPHEADER => array(
-                "Authorization: Bearer FLWSECK-e5f055aa50071dc0c376a4703d7f7b97-X"
+                "Authorization: Bearer $lSecret"
             ),
             ));
             $response = curl_exec($curl);
@@ -364,7 +619,7 @@
                         CURLOPT_POSTFIELDS =>"{\n    \"account_bank\": \"$bank\",\n    \"account_number\": \"$act\",\n    \"business_name\": \"$tn\",\n    \"business_email\": \"$email\",\n    \"business_contact\": \"$address\",\n    \"business_contact_mobile\": \"$phone\",\n    \"business_mobile\": \"$phone\",\n    \"country\": \"$c\",\n    \"meta\": [\n        {\n            \"meta_name\": \"mem_adr\",\n            \"meta_value\": \"0x16241F327213\"\n        }\n    ],\n    \"split_type\": \"percentage\",\n    \"split_value\": 0.9\n}",
                         CURLOPT_HTTPHEADER => array(
                             "Content-Type: application/json",
-                            "Authorization: Bearer FLWSECK-e5f055aa50071dc0c376a4703d7f7b97-X"
+                            "Authorization: Bearer $lSecret"
                         ),
                         ));
 
@@ -496,7 +751,7 @@
                 CURLOPT_POSTFIELDS =>"{\n    \"account_bank\": \"$bank\",\n    \"account_number\": \"$acn\",\n    \"business_name\": \"$company_name\",\n    \"business_email\": \"$email\",\n    \"business_contact\": \"$address\",\n    \"business_contact_mobile\": \"$phone\",\n    \"business_mobile\": \"09087930450\",\n    \"country\": \"$country\",\n    \"meta\": [\n        {\n            \"meta_name\": \"mem_adr\",\n            \"meta_value\": \"0x16241F327213\"\n        }\n    ],\n    \"split_type\": \"percentage\",\n    \"split_value\": 0.85\n}",
                 CURLOPT_HTTPHEADER => array(
                     "Content-Type: application/json",
-                    "Authorization: Bearer FLWSECK-e5f055aa50071dc0c376a4703d7f7b97-X"
+                    "Authorization: Bearer $lSecret"
                 ),
                 ));
 

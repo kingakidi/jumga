@@ -2,6 +2,11 @@
      if (!isset($_SESSION['juId'])) {
         header("Location: ../login.php");
       }
+
+    //   CHECK FOR USERTYPE 
+   
+
+      
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,5 +37,6 @@
     <link href="css/sydee.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <script src="./vendor/textEditor/ckeditor.js"></script>
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css">
     <!-- <script src="https://cdn.ckeditor.com/4.15.1/standard/ckeditor.js"></script> -->
 </head>

@@ -48,11 +48,23 @@
                     echo '
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="p-image">Select Images </label>
-                        <input type="file" name="p-image" id="p-image" class="file">
+                    <div class="row">
+                        <div class="col-sm">
+                            <div>
+                                <label for="">Select Product Image </label>
+                            </div>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="p-image">
+                                <label class="custom-file-label" for="p-image">Choose file</label>
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <div class="image-info" id="image-info" accept="image/*"></div>
+                        </div>
                     </div>
-                    <div class="error" id="pfError"></div>
+                    <div class="m-3">
+                        <div class="error" id="pfError"></div>
+                    </div>
                     <div class="form-group text-right">
                         <button type="submit" class="btn btn-info" id="btn-pf">Add</button>
                     </div>
@@ -65,7 +77,7 @@
        echo '<form class="category-form" id="category-form">
        <div class="form-group">
            <label for="category-name"> Category Name</label>
-           <input type="text" class="form-control" placeholder="Category Name" id="category-name">
+           <input type="text" class="form-control" placeholder="Category Name" id="category-name" required>
        </div>
        <div class="form-group">
            <label for="password">Password</label>
@@ -75,7 +87,7 @@
        <div class="form-group text-right">
             <button type="submit" id="btn-af" class="btn btn-info">Add</button>
        </div>
-   </form>';
+        </form>';
     }
 
 
@@ -132,13 +144,13 @@
                     <div class="col-sm">
                         <div class="form-group">
                             <label for="dob">Date of Birth</label>
-                            <input type="date" class="form-control"  id="dob">
+                            <input type="date" class="form-control"  id="dob" required>
                         </div>
                     </div>
                     <div class="col-sm">
                         <div class="form-group">
                             <label for="address">Address</label>
-                            <input type="text" class="form-control" id="address" placeholder="Address">
+                            <input type="text" class="form-control" id="address" placeholder="Address" required>
                         </div>
                     </div>
                 </div>
@@ -147,13 +159,13 @@
                     <div class="col-sm">
                         <div class="form-group">
                             <label for="city">City</label>
-                            <input type="text" class="form-control" id="city" placeholder="City">
+                            <input type="text" class="form-control" id="city" placeholder="City" required>
                         </div>
                     </div>
                     <div class="col-sm">
                     <div class="form-group">
                             <label for="state">State</label>
-                            <input type="text" class="form-control" id="state" placeholder="State">
+                            <input type="text" class="form-control" id="state" placeholder="State" required>
                         </div>
                     </div>
                 </div>
@@ -285,7 +297,7 @@
         <form class="riderForm" id="riderForm">
         
                 <div class="form-group">
-                    <select name="riderName" id="riderName" class="select form-control">
+                    <select name="riderName" id="riderName" class="select form-control" >
                         <option value="" selected disabled>Select Rider</option>';
         $riderQuery = mysqli_query($conn, "SELECT * FROM rider WHERE status ='approved'");
         while ($row = mysqli_fetch_assoc($riderQuery)) {
@@ -320,13 +332,13 @@
                         <div class="col-sm">
                             <div class="form-group">
                                 <label for="company-name">Company Name</label>
-                                <input type="text" class="form-control" placeholder="Company Name" id="company-name">
+                                <input type="text" class="form-control" placeholder="Company Name" id="company-name" required>
                             </div>
                         </div>
                         <div class="col-sm">
                             <div class="form-group">
                                 <label for="address">Company Address </label>
-                                <input type="text" placeholder="Company Address" class="form-control" id="company-address">
+                                <input type="text" placeholder="Company Address" class="form-control" id="company-address" required>
                             </div>
                         </div>
                     </div>
@@ -335,13 +347,13 @@
                         <div class="col-sm">
                             <div class="form-group">
                                 <label for="number-of-fleet">Number of Fleet</label>
-                                <input type="number" class="form-control" id="number-of-fleet" placeholder="Number of Fleets">
+                                <input type="number" class="form-control" id="number-of-fleet" placeholder="Number of Fleets" required>
                             </div>
                         </div>
                         <div class="col-sm">
                             <div class="form-group">
                                 <label for="company-phone">Company Phone</label>
-                                <input type="number" class="company-phone form-control" id="company-phone" placeholder="Company Phone">
+                                <input type="number" class="company-phone form-control" id="company-phone" placeholder="Company Phone" required>
                             </div>
                         </div>
                     </div>
@@ -351,7 +363,7 @@
                                 <div>
                                     <label for="document">Company Document (PDF Only)</label>
                                 </div>
-                                <input type="file" class="file" id="company-file">
+                                <input type="file" class="file" id="company-file" required>
                                 
                             </div>
                         </div>
@@ -395,18 +407,17 @@
                             <div class="settlement-container">
                                 <form action="" class="settlement-form" id="settlement-form">
                                     <div class="row">
-                                
                                     <div class="col-sm">
                                     <div class="form-group">
                                             <label for="account-number" id="">Account Number</label>
-                                            <input type="number" class="form-control" placeholder="Account Number" id="account-number">
+                                            <input type="number" class="form-control" placeholder="Account Number" id="account-number" required>
                                         </div>
                                     </div>
                                 </div>  
                                 <div class="row">
                                     <div class="col-sm">
                                         <label for="country">Country</label>
-                                        <select name="country" id="country" class="form-control">
+                                        <select name="country" id="country" class="form-control" required>
                         
                                             <option value="" selected disabled>Select Country</option>
                                             <option value="NG">NIGERIA</option>
@@ -418,7 +429,7 @@
                                     <div class="col-sm">
                                         <div class="form-group">
                                             <label for="banks">Select Bank</label>
-                                            <select name="banks" id="banks" class="form-control">
+                                            <select name="banks" id="banks" class="form-control" required>
                                             <option value="">Select Country First</option>
                                             </select>
                                         </div>
